@@ -9,6 +9,20 @@ const getEmpresas = (): Promise<IEmpresa[]> => {
     return empresaRepository.find();
 }
 
+const novaEmpresa = (novaEmpresaData: Partial<cadEmpresa>): Promise<cadEmpresa> => {
+    const novaEmpresa = empresaRepository.create(novaEmpresaData);
+    return empresaRepository.save(novaEmpresa);
+}
+
+const atualizarEmpresa = async (id: number, atualizarEmpresaData: Partial<cadEmpresa>): Promise<cadEmpresa | undefined> => {
+    const empresaExistente = await empresaRepository.findOne({where: {id}});
+    if (!empresaExistente) {
+        throw new Error (`Empresa com id ${id} não encontrada.`);
+    }
+    empresaRepository.merge(empresaExistente, atualizarEmpresaData);
+    return empresaRepository.save(empresaExistente);
+}
+
 const removerEmpresa = (id: number): Promise<IEmpresa[]> => {
     return empresaRepository.delete(id).then(() => {
         return empresaRepository.find();
@@ -17,4 +31,4 @@ const removerEmpresa = (id: number): Promise<IEmpresa[]> => {
     });
 };
 
-export default { getEmpresas, removerEmpresa };
+export default { getEmpresas, removerEmpresa, novaEmpresa, atualizarEmpresa };
